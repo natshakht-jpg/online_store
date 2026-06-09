@@ -1,26 +1,37 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.views.generic import ListView, DetailView, TemplateView
 from .models import Product, Contact
-from django.shortcuts import redirect
 from .forms import ProductForm
-from django.core.paginator import Paginator
 
-def home(request):
-    products = Product.objects.all()
-    paginator = Paginator(products, 3)  # 3 товара на страницу
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'catalog/home.html', {'page_obj': page_obj})
+class ProductListView(ListView):
+    model = Product
+    template_name = 'catalog/home.html'
+    context_object_name = 'page_obj'
+    paginate_by = 3
 
-def contacts(request):
-    contact = Contact.objects.first()
-    if request.method == 'POST':
+    def get_queryset(self):
+        return Product.objects.all()
+
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'catalog/product_detail.html'
+    context_object_name = 'product'
+
+class ContactView(TemplateView):
+    template_name = 'catalog/contacts.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['contact'] = Contact.objects.first()
+        return context
+
+    def post(self, request, *args, **kwargs):
         name = request.POST.get('name')
         phone = request.POST.get('phone')
         message = request.POST.get('message')
         print(f'Имя: {name}, Телефон: {phone}, Сообщение: {message}')
         return HttpResponse('Спасибо, ваше сообщение отправлено!')
-    return render(request, 'catalog/contacts.html', {'contact': contact})
 
 def product_detail(request, pk):
     product = Product.objects.get(pk=pk)
