@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.views.generic import ListView, DetailView, TemplateView, UpdateView, DeleteView
-from .models import Product, Contact
-from .forms import ProductForm
+from django.views.generic import ListView, DetailView, TemplateView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.urls import reverse_lazy
+from .models import Product, Contact
+from .forms import ProductForm
 
 class ProductListView(ListView):
     model = Product
@@ -26,6 +27,23 @@ class ProductDetailView(DetailView):
     template_name = 'catalog/product_detail.html'
     context_object_name = 'product'
 
+class ProductCreateView(LoginRequiredMixin, CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_form.html'
+    success_url = reverse_lazy('home')
+
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_form.html'
+    success_url = reverse_lazy('home')
+
+class ProductDeleteView(LoginRequiredMixin, DeleteView):
+    model = Product
+    template_name = 'catalog/product_confirm_delete.html'
+    success_url = reverse_lazy('home')
+
 class ContactView(TemplateView):
     template_name = 'catalog/contacts.html'
 
@@ -40,36 +58,3 @@ class ContactView(TemplateView):
         message = request.POST.get('message')
         print(f'Имя: {name}, Телефон: {phone}, Сообщение: {message}')
         return HttpResponse('Спасибо, ваше сообщение отправлено!')
-
-def product_create(request):
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Дополнительная проверка запрещённых слов
-            name = form.cleaned_data.get('name')
-            description = form.cleaned_data.get('description')
-            forbidden = ['казино', 'криптовалют', 'крипт', 'бирж', 'дешев', 'бесплатн', 'обман', 'полиц', 'радар']
-            for word in forbidden:
-                if word in name.lower():
-                    form.add_error('name', f'Название не должно содержать слово "{word}"')
-                    has_error = True
-                if description and word in description.lower():
-                    form.add_error('description', f'Описание не должно содержать слово "{word}"')
-                    has_error = True
-            if not has_error:
-                form.save()
-                return redirect('/')
-    else:
-        form = ProductForm()
-    return render(request, 'catalog/product_form.html', {'form': form})
-
-class ProductUpdateView(UpdateView):
-    model = Product
-    form_class = ProductForm
-    template_name = 'catalog/product_form.html'
-    success_url = reverse_lazy('home')
-
-class ProductDeleteView(DeleteView):
-    model = Product
-    template_name = 'catalog/product_confirm_delete.html'
-    success_url = reverse_lazy('home')
