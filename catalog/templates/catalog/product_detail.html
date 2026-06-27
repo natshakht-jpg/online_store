@@ -13,7 +13,17 @@
 
         <p><strong>Цена:</strong> {{ product.price }} $</p>
         <p><strong>Описание:</strong> {{ product.description }}</p>
+
         <a href="/" class="btn btn-secondary">Назад</a>
+
+        <!-- Кнопки редактирования и удаления -->
+        {% if user == product.owner or user.is_superuser %}
+            <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-secondary">Редактировать</a>
+        {% endif %}
+
+        {% if user == product.owner or user.is_superuser or perms.catalog.can_unpublish_product %}
+            <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">Удалить</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
