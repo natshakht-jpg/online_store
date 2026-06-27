@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'catalog',
     'blog',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -120,3 +121,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Настройки для отправки писем в файл (для проверки доп. задания)
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
+
+AUTH_USER_MODEL = 'users.User'
+
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'home'
