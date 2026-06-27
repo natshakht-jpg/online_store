@@ -4,7 +4,7 @@ from .models import User
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    list_display = ('email', 'phone', 'country', 'is_staff', 'is_moderator')
+    list_display = ('email', 'phone', 'country', 'is_staff', 'is_moderator', 'is_content_manager')
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Личная информация', {'fields': ('avatar', 'phone', 'country')}),
@@ -23,3 +23,8 @@ class CustomUserAdmin(UserAdmin):
         return obj.groups.filter(name='Модератор продуктов').exists()
     is_moderator.boolean = True
     is_moderator.short_description = 'Модератор'
+
+    def is_content_manager(self, obj):
+        return obj.groups.filter(name='Контент-менеджер').exists()
+    is_content_manager.boolean = True
+    is_content_manager.short_description = 'Контент-менеджер'
