@@ -17,6 +17,15 @@
                 <h1 class="card-title pricing-card-title">{{ product.price }} $</h1>
                 <p class="card-text">{{ product.description|truncatechars:100 }}</p>
                 <a href="/products/{{ product.pk }}/" class="btn btn-primary">Подробнее</a>
+
+                <!-- Кнопки редактирования и удаления -->
+                {% if user == product.owner or user.is_superuser %}
+                    <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-secondary btn-sm">Редактировать</a>
+                {% endif %}
+
+                {% if user == product.owner or user.is_superuser or perms.catalog.can_unpublish_product %}
+                    <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger btn-sm">Удалить</a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -40,6 +49,7 @@
         {% endif %}
     </span>
 </div>
+
 <style>
     .pagination a, .pagination span {
         display: inline-block;

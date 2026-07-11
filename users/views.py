@@ -30,7 +30,7 @@ class RegisterView(View):
                 recipient_list=[user.email],
                 fail_silently=True,
             )
-            return redirect('home')
+            return redirect('catalog:home')
         return render(request, self.template_name, {'form': form})
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
