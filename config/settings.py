@@ -129,7 +129,7 @@ LOGIN_REDIRECT_URL = 'catalog:home'
 LOGOUT_REDIRECT_URL = 'catalog:home'
 
 # Настройки кеширования (Redis)
-CACHE_ENABLED = True
+CACHE_ENABLED = os.getenv('CACHE_ENABLED', 'True') == 'True'
 if CACHE_ENABLED:
     CACHES = {
         'default': {
